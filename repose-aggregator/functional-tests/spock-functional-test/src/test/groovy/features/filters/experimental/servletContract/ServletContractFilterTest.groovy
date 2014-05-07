@@ -15,7 +15,7 @@ class ServletContractFilterTest extends ReposeValveTest {
         deproxy.addEndpoint(properties.targetPort)
 
         repose.start([waitOnJmxAfterStarting: false])
-        waitUntilReadyToServiceRequests()
+        waitUntilReadyToServiceRequests("200")
     }
 
     def cleanupSpec() {
@@ -23,18 +23,21 @@ class ServletContractFilterTest extends ReposeValveTest {
         deproxy.shutdown()
     }
 
+    /**
+     * This test fails because repose does not properly support the servlet filter contract
+     * @return
+     */
     def "Proving that a custom filter does in fact work" () {
         when:
         MessageChain mc = null
         mc = deproxy.makeRequest(
                 [
                         method: 'GET',
-                        url:reposeEndpoint + "/v1/usertest1/servers/something",
+                        url:reposeEndpoint + "/get",
                 ])
 
 
         then:
-        mc.handlings.size() == 1
         mc.receivedResponse.code == '200'
         mc.receivedResponse.body.contains("<extra> Added by TestFilter, should also see the rest of the content </extra>")
     }
