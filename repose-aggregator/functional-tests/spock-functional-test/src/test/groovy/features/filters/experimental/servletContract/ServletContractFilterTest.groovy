@@ -10,10 +10,12 @@ class ServletContractFilterTest extends ReposeValveTest {
         def params = properties.defaultTemplateParams
         repose.configurationProvider.applyConfigs("common", params)
         repose.configurationProvider.applyConfigs("features/filters/experimental/servletfilter", params)
-        repose.start()
+
         deproxy = new Deproxy()
         deproxy.addEndpoint(properties.targetPort)
 
+        repose.start([waitOnJmxAfterStarting: false])
+        waitUntilReadyToServiceRequests()
     }
 
     def cleanupSpec() {
